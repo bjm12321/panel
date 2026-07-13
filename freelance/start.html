@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Canon — Start Here</title>
+<style>
+  html { background: #171310; }
+  body {
+    margin: 0;
+    background: #171310;
+    color: #ddd6ca;
+    font-family: "IBM Plex Sans", -apple-system, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top bar: progress + chapter */
+  .top { padding: 1rem 1.25rem 0.5rem; }
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .eyebrow .pos { color: #8f8677; letter-spacing: 0.08em; }
+  .bar {
+    height: 4px;
+    background: #1e1915;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+  }
+  .bar > i { display: block; height: 100%; background: #c9a96e; width: 0; transition: width 0.25s; }
+
+  /* Card area */
+  .stage {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0.75rem 1.25rem 1rem;
+  }
+  .card {
+    background: #1e1915;
+    border: 1px solid rgba(221, 214, 202, 0.14);
+    border-radius: 14px;
+    padding: 1.4rem 1.4rem 1.5rem;
+    width: min(34rem, 100%);
+  }
+  .chap {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8f8677;
+    margin: 0 0 0.4rem;
+  }
+  .card h1 { font-size: 1.35rem; line-height: 1.3; font-weight: 600; margin: 0 0 0.2rem; }
+  .why {
+    color: #c9a96e;
+    font-size: 0.9rem;
+    margin: 0 0 1rem;
+  }
+  .card p { margin: 0.6rem 0; }
+  .card ol, .card ul { margin: 0.6rem 0; padding-left: 1.3rem; }
+  .card li { margin: 0.35rem 0; }
+  .card strong { color: #ecdfc9; font-weight: 600; }
+  .card a { color: #c9a96e; }
+
+  .rule { display: flex; gap: 0.6rem; margin: 0.55rem 0; }
+  .rule .k { color: #c9a96e; font-weight: 600; flex: 0 0 auto; }
+
+  /* Snippet + copy */
+  .snip {
+    position: relative;
+    background: #171310;
+    border: 1px solid rgba(221, 214, 202, 0.16);
+    border-radius: 9px;
+    padding: 0.75rem 0.85rem;
+    margin: 0.75rem 0;
+  }
+  .snip .lbl {
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8f8677;
+    margin-bottom: 0.35rem;
+  }
+  .snip pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #ddd6ca;
+  }
+  .copy {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    background: #1e1915;
+    border: 1px solid rgba(221, 214, 202, 0.22);
+    border-radius: 6px;
+    color: #ddd6ca;
+    font: inherit;
+    font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    cursor: pointer;
+  }
+  .copy:hover { border-color: #c9a96e; color: #c9a96e; }
+  .copy.ok { border-color: #7fa66a; color: #7fa66a; }
+
+  .btnlink {
+    display: inline-block;
+    background: #c9a96e;
+    color: #171310;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 0.5rem 0.95rem;
+    margin: 0.5rem 0 0.2rem;
+  }
+  .note { color: #8f8677; font-size: 0.85rem; }
+
+  /* Done toggle */
+  .done {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.15rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(221, 214, 202, 0.1);
+    color: #8f8677;
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .done .box {
+    width: 1.05rem;
+    height: 1.05rem;
+    border: 1px solid rgba(221, 214, 202, 0.35);
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #171310;
+  }
+  .done.on { color: #7fa66a; }
+  .done.on .box { background: #7fa66a; border-color: #7fa66a; }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0 1.25rem 1.25rem;
+    max-width: min(34rem, 100%);
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .nav button {
+    flex: 1;
+    border-radius: 9px;
+    font: inherit;
+    font-weight: 600;
+    padding: 0.7rem;
+    cursor: pointer;
+  }
+  #prev { background: none; border: 1px solid rgba(221, 214, 202, 0.25); color: #ddd6ca; }
+  #prev:disabled { opacity: 0.3; cursor: default; }
+  #next { background: #c9a96e; border: 0; color: #171310; }
+  .dotrow { display: flex; gap: 0.3rem; justify-content: center; padding: 0 1.25rem 0.75rem; flex-wrap: wrap; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #322b23; }
+  .dot.done { background: #7fa66a; }
+  .dot.cur { background: #c9a96e; transform: scale(1.35); }
+</style>
+</head>
+<body>
+<div class="top">
+  <p class="eyebrow"><span>Canon · Freelance Start</span> <span class="pos" id="pos"></span></p>
+  <div class="bar"><i id="fill"></i></div>
+</div>
+
+<div class="stage"><div class="card" id="card"></div></div>
+
+<div class="dotrow" id="dots"></div>
+<div class="nav">
+  <button id="prev">← Back</button>
+  <button id="next">Next →</button>
+</div>
+
+<script>
+  var PROG = "canon-guide-progress";
+
+  // ---- snippets (copy-paste ready) --------------------------------------
+  var BIO =
+"I build small automations, data-cleanup scripts, landing pages, and spreadsheet tools — fast.\n\n" +
+"I work with modern AI-assisted development and personally test every deliverable before I hand it over. If you need a clean, working result quickly and without drama, that's what I do.\n\n" +
+"Best fit for: CSV/Excel cleanup, format conversion, small Python scripts, one-page sites and site fixes, Google Sheets automation and dashboards, and clear technical docs.\n\n" +
+"— [[YOUR NAME]]";
+
+  var PORTFOLIO_PROMPT =
+"I'm setting up a fresh Upwork profile. Build me 3 small portfolio pieces I can show, each fully self-contained and tested:\n\n" +
+"1. A Python script that cleans a messy sample CSV (dedupes, fixes dates, trims whitespace) and writes a clean file — include sample input, output, and a short README.\n" +
+"2. A one-page landing site (clean HTML/CSS, mobile-friendly) for a made-up small business.\n" +
+"3. A Google Sheets dashboard mock (formulas + a simple chart) over sample sales data, with a one-page how-it-works note.\n\n" +
+"Keep each one small, realistic, and genuinely working. Show me the files.";
+
+  var SEARCHES = [
+"csv OR excel cleanup script python",
+"landing page html OR \"static site\" fix",
+"google sheets automation OR dashboard formula",
+"api script OR \"data conversion\" small task"
+  ];
+
+  var TRIAGE_PROMPT =
+"Here are freelance job listings I copied (title, description, budget, client stats below). Apply the triage rubric in freelance/TRIAGE.md: reject the disqualifiers, score the survivors 0–10, and return the SHORTLIST / BORDERLINE / REJECTED format. For each shortlisted job, draft a proposal from the matching template in freelance/proposals/, leaving the [[OPERATOR: ...]] slots for me.\n\n" +
+"LISTINGS:\n[[PASTE 10–20 LISTINGS HERE]]";
+
+  var BUILD_PROMPT =
+"I won this job. Here is the client's spec (pasted below). Build the full deliverable now, self-contained and tested against real/sample data. Then give me the acceptance checklist from the proposal so I can verify before I deliver, plus a short README/how-it-works note for the client.\n\n" +
+"SPEC:\n[[PASTE CLIENT SPEC HERE]]";
+
+  // ---- cards -------------------------------------------------------------
+  // snip() stashes copy text by id and returns markup; declared before C so
+  // the array literal below can call it while it builds.
+  var SNIPS = {};
+  function snip(label, text, id) {
+    SNIPS[id] = text;
+    var esc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return "<div class='snip'><div class='lbl'>" + label + "</div>" +
+      "<button class='copy' data-copy='" + id + "'>Copy</button>" +
+      "<pre>" + esc + "</pre></div>";
+  }
+
+  // each: {chap, title, why, html}
+  var C = [
+    { chap: "Start Here", title: "What this actually is",
+      why: "The whole model in 15 seconds.",
+      html:
+        "<p>Three moving parts:</p>" +
+        "<ol>" +
+        "<li><strong>You</strong> find small jobs on Upwork and send proposals.</li>" +
+        "<li><strong>Claude</strong> builds the work — scripts, pages, spreadsheets, docs.</li>" +
+        "<li><strong>You</strong> review it, deliver it, get paid and reviewed.</li>" +
+        "</ol>" +
+        "<p class='note'>Your 2–5 hrs/week go only to the human parts: searching, submitting, and the final quality check. Claude does the heavy lifting.</p>" },
+
+    { chap: "Start Here", title: "5 rules that keep you alive",
+      why: "Break one and you can lose the account before earning a dollar.",
+      html:
+        "<div class='rule'><span class='k'>1</span><span><strong>Never scrape or auto-submit</strong> on the platform. You paste jobs to Claude by hand.</span></div>" +
+        "<div class='rule'><span class='k'>2</span><span><strong>Be honest about AI.</strong> If a job says “no AI,” skip it.</span></div>" +
+        "<div class='rule'><span class='k'>3</span><span><strong>No client logins.</strong> You deliver files, never take their passwords.</span></div>" +
+        "<div class='rule'><span class='k'>4</span><span><strong>You review everything</strong> before it goes out. “The AI did it” is never an excuse.</span></div>" +
+        "<div class='rule'><span class='k'>5</span><span><strong>No client names or dollar amounts in this repo.</strong> It's a public page. Private data stays in the tracker on your device.</span></div>" +
+        "<p class='note'>Full detail in the <a href='PLAYBOOK.md'>playbook</a>.</p>" },
+
+    { chap: "Week 0 · Set up once (~2 hrs)", title: "Create your Upwork account",
+      why: "One platform, done properly, beats five half-built ones.",
+      html:
+        "<p>Sign up as a freelancer. This is the only platform you touch until you've earned 5 reviews.</p>" +
+        "<a class='btnlink' href='https://www.upwork.com/signup/' target='_blank' rel='noopener'>Open Upwork signup ↗</a>" +
+        "<p class='note'>Fiverr comes later (Chapter 4), not now.</p>" },
+
+    { chap: "Week 0 · Set up once (~2 hrs)", title: "Write your profile",
+      why: "Specific beats impressive. Buyers hire clarity.",
+      html:
+        "<p>Paste this as your profile bio and swap in your name:</p>" +
+        snip("Profile bio", BIO, "bio") +
+        "<p class='note'>List these as skills: data cleanup, Python scripting, landing pages, Google Sheets, technical writing.</p>" },
+
+    { chap: "Week 0 · Set up once (~2 hrs)", title: "Build 3 portfolio pieces",
+      why: "A fresh account with visible work beats an empty one every time.",
+      html:
+        "<p>Open a Claude session and paste this. You'll have 3 real samples to show in one sitting:</p>" +
+        snip("Paste to Claude", PORTFOLIO_PROMPT, "port") },
+
+    { chap: "Week 0 · Set up once (~2 hrs)", title: "Save 4 searches",
+      why: "These are the only four categories worth your time.",
+      html:
+        "<p>On Upwork, run each search and hit <strong>Save search</strong>. Now your weekly hunt is 4 clicks.</p>" +
+        snip("1 · Automation & data", SEARCHES[0], "s0") +
+        snip("2 · Landing pages & fixes", SEARCHES[1], "s1") +
+        snip("3 · Spreadsheets & dashboards", SEARCHES[2], "s2") +
+        snip("4 · Scripts & conversions", SEARCHES[3], "s3") },
+
+    { chap: "Each week · Find & win (~1 hr)", title: "Copy 10–20 listings",
+      why: "Volume in, so Claude can hand you only the winners.",
+      html:
+        "<p>Run your 4 saved searches. Copy the full text (title, description, budget, client stats) of every plausible job into one block.</p>" +
+        "<p><strong>Good sign:</strong> clear scope, payment verified, has hired before. <strong>Skip:</strong> vague “got an idea, let's chat,” no budget, brand-new client with nothing verified.</p>" },
+
+    { chap: "Each week · Find & win (~1 hr)", title: "Triage with Claude",
+      why: "Claude reads all 20 and ranks them so you don't waste bids.",
+      html:
+        "<p>Paste your listings into this prompt. You get back the top 3–5 with proposals already drafted:</p>" +
+        snip("Paste to Claude", TRIAGE_PROMPT, "tri") +
+        "<p class='note'>It scores against <a href='TRIAGE.md'>TRIAGE.md</a> and drafts from <a href='proposals/'>proposals/</a>.</p>" },
+
+    { chap: "Each week · Find & win (~1 hr)", title: "Personalize & submit",
+      why: "The one part only a human can do — and what wins the job.",
+      html:
+        "<p>In each draft, fill the <strong>[[OPERATOR: ...]]</strong> slots — one genuine personal line about the client. Then submit by hand.</p>" +
+        "<p>Log each one as <strong>Proposed</strong> in your tracker.</p>" +
+        "<a class='btnlink' href='tracker.html' target='_blank' rel='noopener'>Open the tracker ↗</a>" },
+
+    { chap: "On a win · Deliver (~30 min)", title: "Hand the spec to Claude",
+      why: "This is where the money gets made — fast.",
+      html:
+        "<p>Client said yes. Paste their spec into this prompt and Claude builds the whole thing:</p>" +
+        snip("Paste to Claude", BUILD_PROMPT, "bld") },
+
+    { chap: "On a win · Deliver (~30 min)", title: "Test it yourself",
+      why: "You are the quality gate. Every 5-star review depends on this.",
+      html:
+        "<p>Run the deliverable against the <strong>acceptance checklist</strong> Claude gives you. Does it work on their real data? Match the agreed format? Handle the edge cases they named?</p>" +
+        "<p>If anything's off, send it back to Claude before it ever reaches the client.</p>" },
+
+    { chap: "On a win · Deliver (~30 min)", title: "Deliver & ask for the review",
+      why: "Reviews are the asset. Speed + a clean handoff earns them.",
+      html:
+        "<p>Send the files + the short how-it-works note. Confirm they're happy, then politely ask for a review.</p>" +
+        "<p>Move the tracker card to <strong>Delivered</strong>, then <strong>Paid</strong>.</p>" +
+        "<p class='note'>Aim for 24–48 hr turnaround. Speed is the one edge you have over established freelancers.</p>" },
+
+    { chap: "Level up", title: "The 3 pricing phases",
+      why: "Charge to win first, charge properly later.",
+      html:
+        "<div class='rule'><span class='k'>1</span><span><strong>Jobs 1–5 — farm reviews.</strong> Bid $30–150, priced to win. Goal is five 5-star reviews, not profit.</span></div>" +
+        "<div class='rule'><span class='k'>2</span><span><strong>After 5 reviews — market rate.</strong> $50–400 depending on category. Raise ~20% every 5 jobs while you keep winning.</span></div>" +
+        "<div class='rule'><span class='k'>3</span><span><strong>After ~15 jobs — productize.</strong> Open a Fiverr storefront for whatever converts best.</span></div>" +
+        "<p class='note'>Never bid below $30 — that segment is all headache.</p>" },
+
+    { chap: "Level up", title: "Your milestones",
+      why: "Know exactly when to level up. Check these off as you go.",
+      html: "<div id='miles'></div>" +
+        "<p class='note'>These persist on this device.</p>" },
+
+    { chap: "Level up", title: "Honest expectations",
+      why: "So you measure success against reality, not hype.",
+      html:
+        "<p><strong>Month 1:</strong> ~$100–400 total. You're buying a sellable account with real reviews. That's the win.</p>" +
+        "<p><strong>Months 2–3:</strong> at market rate and ~3 wins/week, roughly $300–900/month inside your 2–5 hrs.</p>" +
+        "<p>Anyone promising more, faster, on a zero-review account is selling something. The compounding asset is your review history plus a tracker full of data on what <em>you</em> actually win.</p>" +
+        "<p class='note'>You've reached the end. Everything's in the <a href='PLAYBOOK.md'>playbook</a> when you need depth.</p>" }
+  ];
+
+  var MILES = [
+    "Upwork profile live with 3 portfolio pieces",
+    "First proposal submitted",
+    "First job won",
+    "5 reviews → switch to market-rate pricing",
+    "15 jobs → open Fiverr storefront"
+  ];
+
+  var state = load();
+  function load() { try { return JSON.parse(localStorage.getItem(PROG)) || {}; } catch (e) { return {}; } }
+  function save() { try { localStorage.setItem(PROG, JSON.stringify(state)); } catch (e) {} }
+
+  var i = Math.min(state.at || 0, C.length - 1);
+  var cardEl = document.getElementById("card");
+
+  function render() {
+    var c = C[i];
+    cardEl.innerHTML =
+      "<p class='chap'>" + c.chap + "</p>" +
+      "<h1>" + c.title + "</h1>" +
+      "<p class='why'>" + c.why + "</p>" +
+      c.html;
+
+    // milestones card
+    var mEl = cardEl.querySelector("#miles");
+    if (mEl) {
+      state.miles = state.miles || {};
+      MILES.forEach(function (m, mi) {
+        var on = !!state.miles[mi];
+        var d = document.createElement("div");
+        d.className = "done" + (on ? " on" : "");
+        d.style.borderTop = "0";
+        d.style.paddingTop = "0";
+        d.style.marginTop = "0.5rem";
+        d.innerHTML = "<span class='box'>" + (on ? "✓" : "") + "</span><span>" + m + "</span>";
+        d.addEventListener("click", function () {
+          state.miles[mi] = !state.miles[mi];
+          save(); render();
+        });
+        mEl.appendChild(d);
+      });
+    }
+
+    // copy buttons
+    cardEl.querySelectorAll(".copy").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var txt = SNIPS[btn.getAttribute("data-copy")];
+        var done = function () { btn.textContent = "Copied"; btn.classList.add("ok");
+          setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("ok"); }, 1400); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(done, function () { fallback(txt); done(); });
+        } else { fallback(txt); done(); }
+      });
+    });
+
+    // done toggle (skip on milestones card, it has its own list)
+    if (!mEl) {
+      var isDone = state.done && state.done[i];
+      var t = document.createElement("div");
+      t.className = "done" + (isDone ? " on" : "");
+      t.innerHTML = "<span class='box'>" + (isDone ? "✓" : "") + "</span><span>Mark this step done</span>";
+      t.addEventListener("click", function () {
+        state.done = state.done || {};
+        state.done[i] = !state.done[i];
+        save(); render(); renderDots();
+      });
+      cardEl.appendChild(t);
+    }
+
+    document.getElementById("pos").textContent = (i + 1) + " / " + C.length;
+    document.getElementById("fill").style.width = ((i + 1) / C.length * 100) + "%";
+    document.getElementById("prev").disabled = i === 0;
+    document.getElementById("next").textContent = i === C.length - 1 ? "Done" : "Next →";
+    state.at = i; save();
+    renderDots();
+    cardEl.parentElement.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }
+
+  function fallback(txt) {
+    var ta = document.createElement("textarea");
+    ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  function renderDots() {
+    var row = document.getElementById("dots");
+    row.innerHTML = "";
+    C.forEach(function (_, di) {
+      var d = document.createElement("span");
+      d.className = "dot" + (di === i ? " cur" : "") + (state.done && state.done[di] ? " done" : "");
+      d.addEventListener("click", function () { i = di; render(); });
+      row.appendChild(d);
+    });
+  }
+
+  document.getElementById("prev").addEventListener("click", function () { if (i > 0) { i--; render(); } });
+  document.getElementById("next").addEventListener("click", function () { if (i < C.length - 1) { i++; render(); } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft" && i > 0) { i--; render(); }
+    else if (e.key === "ArrowRight" && i < C.length - 1) { i++; render(); }
+  });
+
+  render();
+</script>
+</body>
+</html>
