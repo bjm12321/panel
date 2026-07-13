@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Canon — Gig Tracker</title>
+<style>
+  html { background: #171310; }
+  body {
+    margin: 0;
+    background: #171310;
+    color: #ddd6ca;
+    font-family: "IBM Plex Sans", -apple-system, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+  header { padding: 1.25rem 1.25rem 0.5rem; }
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    margin: 0 0 0.25rem;
+  }
+  h1 { font-size: 1.15rem; font-weight: 600; margin: 0; }
+  .hint { color: #8f8677; font-size: 0.8rem; margin: 0.25rem 0 0; }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+  }
+  .stat {
+    background: #1e1915;
+    border: 1px solid rgba(221, 214, 202, 0.12);
+    border-radius: 8px;
+    padding: 0.5rem 0.85rem;
+    min-width: 7rem;
+  }
+  .stat b { display: block; font-size: 1.15rem; color: #c9a96e; font-weight: 600; }
+  .stat span { font-size: 0.72rem; color: #8f8677; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .board {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem 1.25rem 1.5rem;
+    overflow-x: auto;
+    align-items: flex-start;
+  }
+  .col {
+    flex: 0 0 15.5rem;
+    background: #1e1915;
+    border: 1px solid rgba(221, 214, 202, 0.12);
+    border-radius: 10px;
+    padding: 0.6rem;
+  }
+  .col h2 {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c9a96e;
+    margin: 0.1rem 0.2rem 0.5rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  .col h2 .n { color: #8f8677; }
+
+  .card {
+    background: #171310;
+    border: 1px solid rgba(221, 214, 202, 0.15);
+    border-radius: 8px;
+    padding: 0.55rem 0.65rem;
+    margin-bottom: 0.5rem;
+  }
+  .card .t { font-weight: 600; word-break: break-word; }
+  .card .m { color: #8f8677; font-size: 0.78rem; margin-top: 0.1rem; word-break: break-word; }
+  .card .v { color: #c9a96e; font-weight: 600; font-size: 0.85rem; }
+  .card .row { display: flex; gap: 0.3rem; margin-top: 0.45rem; }
+  .card button {
+    background: none;
+    border: 1px solid rgba(221, 214, 202, 0.2);
+    border-radius: 6px;
+    color: #ddd6ca;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+  }
+  .card button:hover { border-color: #c9a96e; color: #c9a96e; }
+  .card button.del:hover { border-color: #b0563e; color: #b0563e; }
+
+  .add {
+    width: 100%;
+    background: none;
+    border: 1px dashed rgba(221, 214, 202, 0.25);
+    border-radius: 8px;
+    color: #8f8677;
+    font: inherit;
+    font-size: 0.8rem;
+    padding: 0.4rem;
+    cursor: pointer;
+  }
+  .add:hover { color: #c9a96e; border-color: #c9a96e; }
+
+  dialog {
+    background: #1e1915;
+    color: #ddd6ca;
+    border: 1px solid rgba(221, 214, 202, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    width: min(22rem, 90vw);
+  }
+  dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+  dialog h3 { margin: 0 0 0.75rem; font-size: 1rem; color: #c9a96e; }
+  dialog label { display: block; font-size: 0.78rem; color: #8f8677; margin: 0.6rem 0 0.15rem; }
+  dialog input, dialog select, dialog textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: #171310;
+    border: 1px solid rgba(221, 214, 202, 0.2);
+    border-radius: 8px;
+    color: #ddd6ca;
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0.45rem 0.6rem;
+  }
+  dialog input:focus, dialog select:focus, dialog textarea:focus {
+    outline: 2px solid #c9a96e;
+    outline-offset: 1px;
+  }
+  dialog .actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  dialog .actions button {
+    flex: 1;
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 600;
+    padding: 0.55rem;
+    cursor: pointer;
+  }
+  #save { background: #c9a96e; color: #171310; }
+  #cancel { background: none; border: 1px solid rgba(221, 214, 202, 0.25); color: #ddd6ca; }
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">Canon</p>
+  <h1>Gig Tracker</h1>
+  <p class="hint">Data lives in this browser's localStorage only — nothing is committed or sent anywhere.</p>
+</header>
+
+<div class="stats" id="stats"></div>
+<div class="board" id="board"></div>
+
+<dialog id="dlg">
+  <h3 id="dlg-title">Add gig</h3>
+  <form method="dialog" id="dlg-form">
+    <label for="f-title">Title</label>
+    <input id="f-title" required maxlength="120" placeholder="CSV cleanup for shop inventory">
+    <label for="f-value">Value ($)</label>
+    <input id="f-value" type="number" min="0" step="1" placeholder="75">
+    <label for="f-cat">Category</label>
+    <select id="f-cat">
+      <option>automation</option>
+      <option>landing-page</option>
+      <option>spreadsheet</option>
+      <option>tech-writing</option>
+      <option>other</option>
+    </select>
+    <label for="f-note">Note</label>
+    <textarea id="f-note" rows="2" maxlength="300" placeholder="Client wants delivery by Friday"></textarea>
+    <div class="actions">
+      <button type="button" id="cancel">Cancel</button>
+      <button type="submit" id="save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  var STORE = "canon-gig-tracker";
+  var STAGES = ["Leads", "Proposed", "Won", "Delivered", "Paid"];
+  var gigs = [];
+  try { gigs = JSON.parse(localStorage.getItem(STORE)) || []; } catch (e) {}
+
+  function persist() {
+    try { localStorage.setItem(STORE, JSON.stringify(gigs)); } catch (e) {}
+  }
+
+  function money(n) { return "$" + (Math.round(n * 100) / 100).toLocaleString(); }
+
+  function renderStats() {
+    var proposed = 0, won = 0, earned = 0, pipeline = 0;
+    gigs.forEach(function (g) {
+      if (g.stage >= 1) proposed++;
+      if (g.stage >= 2) won++;
+      if (g.stage === 4) earned += g.value || 0;
+      if (g.stage === 2 || g.stage === 3) pipeline += g.value || 0;
+    });
+    var rate = proposed ? Math.round((won / proposed) * 100) + "%" : "—";
+    var el = document.getElementById("stats");
+    el.innerHTML = "";
+    [
+      [proposed, "Proposals sent"],
+      [rate, "Win rate"],
+      [money(pipeline), "In pipeline"],
+      [money(earned), "Earned"]
+    ].forEach(function (s) {
+      var d = document.createElement("div");
+      d.className = "stat";
+      var b = document.createElement("b");
+      b.textContent = s[0];
+      var sp = document.createElement("span");
+      sp.textContent = s[1];
+      d.appendChild(b);
+      d.appendChild(sp);
+      el.appendChild(d);
+    });
+  }
+
+  function renderBoard() {
+    var board = document.getElementById("board");
+    board.innerHTML = "";
+    STAGES.forEach(function (name, si) {
+      var col = document.createElement("div");
+      col.className = "col";
+      var h = document.createElement("h2");
+      var inStage = gigs.filter(function (g) { return g.stage === si; });
+      h.innerHTML = name + ' <span class="n">' + inStage.length + "</span>";
+      col.appendChild(h);
+
+      inStage.forEach(function (g) {
+        var card = document.createElement("div");
+        card.className = "card";
+
+        var t = document.createElement("div");
+        t.className = "t";
+        t.textContent = g.title;
+        card.appendChild(t);
+
+        var m = document.createElement("div");
+        m.className = "m";
+        m.textContent = g.cat + (g.note ? " — " + g.note : "");
+        card.appendChild(m);
+
+        if (g.value) {
+          var v = document.createElement("div");
+          v.className = "v";
+          v.textContent = money(g.value);
+          card.appendChild(v);
+        }
+
+        var row = document.createElement("div");
+        row.className = "row";
+        [
+          ["←", si > 0, function () { g.stage--; update(); }],
+          ["→", si < STAGES.length - 1, function () { g.stage++; update(); }],
+          ["Edit", true, function () { openDialog(g); }],
+          ["✕", true, function () {
+            if (confirm('Delete "' + g.title + '"?')) {
+              gigs = gigs.filter(function (x) { return x.id !== g.id; });
+              update();
+            }
+          }]
+        ].forEach(function (btn) {
+          if (!btn[1]) return;
+          var b = document.createElement("button");
+          b.textContent = btn[0];
+          if (btn[0] === "✕") b.className = "del";
+          b.addEventListener("click", btn[2]);
+          row.appendChild(b);
+        });
+        card.appendChild(row);
+        col.appendChild(card);
+      });
+
+      var add = document.createElement("button");
+      add.className = "add";
+      add.textContent = "+ add";
+      add.addEventListener("click", function () { openDialog(null, si); });
+      col.appendChild(add);
+      board.appendChild(col);
+    });
+  }
+
+  function update() {
+    persist();
+    renderStats();
+    renderBoard();
+  }
+
+  var dlg = document.getElementById("dlg");
+  var editing = null, addStage = 0;
+
+  function openDialog(gig, stage) {
+    editing = gig;
+    addStage = stage || 0;
+    document.getElementById("dlg-title").textContent = gig ? "Edit gig" : "Add gig";
+    document.getElementById("f-title").value = gig ? gig.title : "";
+    document.getElementById("f-value").value = gig && gig.value ? gig.value : "";
+    document.getElementById("f-cat").value = gig ? gig.cat : "automation";
+    document.getElementById("f-note").value = gig ? gig.note : "";
+    dlg.showModal();
+  }
+
+  document.getElementById("dlg-form").addEventListener("submit", function () {
+    var data = {
+      title: document.getElementById("f-title").value.trim(),
+      value: parseFloat(document.getElementById("f-value").value) || 0,
+      cat: document.getElementById("f-cat").value,
+      note: document.getElementById("f-note").value.trim()
+    };
+    if (!data.title) return;
+    if (editing) {
+      Object.assign(editing, data);
+    } else {
+      data.id = Date.now() + Math.random();
+      data.stage = addStage;
+      gigs.push(data);
+    }
+    update();
+  });
+
+  document.getElementById("cancel").addEventListener("click", function () { dlg.close(); });
+
+  update();
+</script>
+</body>
+</html>
